@@ -15,7 +15,7 @@ mongoose.connect(process.env.DBURL)
 
 app.use('/',userRouter);
 app.get('/', (req, res) => {
-    res.send(process.env.DBURL);
+    res.send("working...!");
 })
 
 app.listen(port, () => {
