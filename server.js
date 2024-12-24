@@ -9,7 +9,6 @@ const port = process.env.PORT || 3000;
 
 mongoose.connect(process.env.DBURL)
 .then(() => console.log("DB Connected..!"))
-.catch((err) => console.log(err)); 
 
 app.get('/', (req, res) => {
     res.send(process.env.DBURL);
