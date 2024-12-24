@@ -27,9 +27,9 @@ userRouter.post('/registerUser', async (req, res) => {
             ],
             date: new Date()
         };
-        const users = await User(data);
-        await users.save();
-        res.json(users);
+        // const users = await User(data);
+        // await users.save();
+        res.json("users");
     } catch (err) {
         res.json({ message: err });
     }
