@@ -5,10 +5,9 @@ const User = require('../Models/userModel');
 userRouter.post('/registerUser', async (req, res) => {
     try {
         const data = req.body;
-        res.send(data);
-        // const users = await User(data);
-        // await users.save();
-        // res.json(users);
+        const users = await User(data);
+        await users.save();
+        res.json(users);
     } catch (err) {
         res.json({ message: err });
     }
@@ -33,7 +32,7 @@ module.exports = userRouter;
 //             "foodName": "Pizza",
 //             "foodQuantity": 2,
 //             "foodPrice": 15.99,
-//             "foodImage": Buffer.from(""),
+//             "foodImage": ""
 //         }
 //     ],
 //     "history": [
@@ -41,8 +40,8 @@ module.exports = userRouter;
 //             "foodName": "Burger",
 //             "foodQuantity": 1,
 //             "foodPrice": 9.99,
-//             "foodImage": Buffer.from(""),
-//             "date": new Date()
+//             "foodImage": "",
+//             "date": ""
 //         }
 //     ],
-// };
+// }
