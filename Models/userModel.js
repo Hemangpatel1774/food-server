@@ -41,7 +41,7 @@ const historySchema = new mongoose.Schema({
         required: false
     },
     date: {
-        type: Date,
+        type: Number,
         default: Date.now()
     }
 });
@@ -64,6 +64,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         min: 1,
         max: 30
+    },
+    isAdmin:{
+        type: Boolean,
+        default: false
     },
     cart: {
         type: [cartSchema],
