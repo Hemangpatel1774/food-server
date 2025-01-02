@@ -92,12 +92,10 @@ userRouter.post('/loginUser', async (req, res) => {
 // ======= Sample =======
 userRouter.post('/addToCart', async (req, res) => {
     try {
-        // console.log(req.body);
-        // res.send({message:"ok"});
         const data = req.body.cartLst;
         const email = req.body.email;
-        const newCart = [];
-        data.forEach(async (item) => {
+        let newCart = [];
+        data.forEach((item) => {
             const cart = {
                 foodName: item.title,
                 rating: item.rating,
@@ -105,15 +103,15 @@ userRouter.post('/addToCart', async (req, res) => {
                 foodPrice: +item.price,
                 foodImage: item.img
             };
-            newCart.push(cart);
+            newCart = [...newCart, cart];
         });
 
-        console.log(email);
-        // console.log("New Cart : ",newCart);
-        const user = new User.find({ email });
-        console.log(user);
-        // user.cart = newCart;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.send({ message: "User not found" });
+        }
 
+        user.cart = newCart;
         await user.save();
         res.send({ message: "ok" });
 
