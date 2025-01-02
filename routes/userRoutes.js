@@ -13,7 +13,7 @@ userRouter.post('/authToken', (req, res) => {
     const token = req.body.token;
     try {
         const decoded = jwtVerify(token);
-        res.send({ auth: true, email : decoded.email });
+        res.send({ auth: true, email: decoded.email });
     } catch (err) {
         res.send({ auth: false, message: 'Invalid token' });
     }
@@ -27,7 +27,7 @@ userRouter.post('/sendOTP/:email', async (req, res) => {
         await sendOtp(email, otp);
         const newOtp = new Otp({ email, otp });
         await newOtp.save();
-        res.send({message:"ok"});
+        res.send({ message: "ok" });
     } catch (err) {
         res.json({ message: err });
     }
@@ -45,7 +45,7 @@ userRouter.post('/verifyOTP/:email/:otp', async (req, res) => {
         // Optionally, you can delete the OTP record after verification
         await Otp.deleteOne({ email, otp });
 
-        res.send({message:"ok"});
+        res.send({ message: "ok" });
     } catch (err) {
         res.json({ message: err });
     }
@@ -55,10 +55,15 @@ userRouter.post('/verifyOTP/:email/:otp', async (req, res) => {
 userRouter.post('/registerUser', async (req, res) => {
     try {
         const data = req.body;
-        const user = new User(data);
-        await user.save();
-        const userToken = jwtSign({ email : req.body.email, password : req.body.password });
-        res.send({message:"ok",userToken,email:data.email});
+        const existingUser = await User.find({ email: data.email });
+        if (existingUser.length > 0) {
+            return res.send({ message: "User already exists" });
+        } else {
+            const user = new User(data);
+            await user.save();
+            const userToken = jwtSign({ email: req.body.email, password: req.body.password });
+            res.send({ message: "ok", userToken, email: data.email });
+        }
     } catch (err) {
         res.send(err.message);
     }
@@ -71,25 +76,45 @@ userRouter.post('/loginUser', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email, password });
-        
+
         if (!user) {
-            return res.send({message:"Invalid email or password"});
+            return res.send({ message: "Invalid email or password" });
         }
         const userToken = jwtSign({ email, password });
-        res.send({message:"ok",userToken ,email});
+        res.send({ message: "ok", userToken, email });
     } catch (err) {
-        res.send({message : err.message});
+        res.send({ message: err.message });
     }
 });
 
 // ======= Sample =======
 userRouter.post('/addToCart', async (req, res) => {
     try {
-        const data = req.body;
-        const user = new User.find({ email: data.email});
-        user.cart.push(data.cart);
+        // console.log(req.body);
+        // res.send({message:"ok"});
+        const data = req.body.cartLst;
+        const email = req.body.email;
+        const newCart = [];
+        data.forEach(async (item) => {
+            const cart = {
+                foodName: item.title,
+                rating: item.rating,
+                foodQuantity: +item.qty,
+                foodPrice: +item.price,
+                foodImage: item.img
+            };
+            newCart.push(cart);
+        });
+
+        console.log(email);
+        // console.log("New Cart : ",newCart);
+        const user = new User.find({ email });
+        console.log(user);
+        // user.cart = newCart;
+
         await user.save();
-        res.json(user);
+        res.send({ message: "ok" });
+
     } catch (err) {
         res.json({ message: err });
     }

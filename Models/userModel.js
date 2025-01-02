@@ -13,7 +13,7 @@ const cartSchema = new mongoose.Schema({
         required: true,
     },
     rating:{
-        type: Number,
+        type: String,
         required: false,
     },
     foodPrice: {
@@ -21,7 +21,7 @@ const cartSchema = new mongoose.Schema({
         required: true
     },
     foodImage: {
-        type: Buffer,
+        type: String,
         required: false
     }
 });
