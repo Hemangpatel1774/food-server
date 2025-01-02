@@ -22,12 +22,17 @@ userRouter.post('/authToken', (req, res) => {
 userRouter.post('/sendOTP/:email', async (req, res) => {
     try {
         const email = req.params.email;
-        const otp = generateOtp();
-        // Ensure sendOtp is awaited if it returns a promise
-        await sendOtp(email, otp);
-        const newOtp = new Otp({ email, otp });
-        await newOtp.save();
-        res.send({ message: "ok" });
+        const existingUser = await User.find({ email: data.email });
+        if (existingUser.length > 0) {
+            return res.send({ message: "User already exists" });
+        } else {
+            const otp = generateOtp();
+            // Ensure sendOtp is awaited if it returns a promise
+            await sendOtp(email, otp);
+            const newOtp = new Otp({ email, otp });
+            await newOtp.save();
+            res.send({ message: "ok" });
+        }
     } catch (err) {
         res.json({ message: err });
     }
@@ -55,15 +60,12 @@ userRouter.post('/verifyOTP/:email/:otp', async (req, res) => {
 userRouter.post('/registerUser', async (req, res) => {
     try {
         const data = req.body;
-        const existingUser = await User.find({ email: data.email });
-        if (existingUser.length > 0) {
-            return res.send({ message: "User already exists" });
-        } else {
-            const user = new User(data);
-            await user.save();
-            const userToken = jwtSign({ email: req.body.email, password: req.body.password });
-            res.send({ message: "ok", userToken, email: data.email });
-        }
+
+        const user = new User(data);
+        await user.save();
+        const userToken = jwtSign({ email: req.body.email, password: req.body.password });
+        res.send({ message: "ok", userToken, email: data.email });
+
     } catch (err) {
         res.send(err.message);
     }
