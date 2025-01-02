@@ -58,7 +58,7 @@ userRouter.post('/registerUser', async (req, res) => {
         const user = new User(data);
         await user.save();
         const userToken = jwtSign({ email : req.body.email, password : req.body.password });
-        res.send({message:"ok",userToken});
+        res.send({message:"ok",userToken,email:data.email});
     } catch (err) {
         res.send(err.message);
     }
@@ -76,7 +76,7 @@ userRouter.post('/loginUser', async (req, res) => {
             return res.send({message:"Invalid email or password"});
         }
         const userToken = jwtSign({ email, password });
-        res.send({message:"ok",userToken});
+        res.send({message:"ok",userToken ,email});
     } catch (err) {
         res.send({message : err.message});
     }
