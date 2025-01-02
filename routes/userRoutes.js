@@ -4,16 +4,48 @@ const User = require('../Models/userModel');
 const Otp = require('../Models/otpModel');
 const generateOtp = require('../funcs/generateOtp');
 const sendOtp = require('../funcs/sendOtp');
+const jwt = require('jsonwebtoken');
+const { jwtSign, jwtVerify } = require('../funcs/jwtFuncs');
 
+
+// Authenticate JWT
+userRouter.post('/authToken', (req, res) => {
+    const token = req.body.token;
+    try {
+        const decoded = jwtVerify(token);
+        res.send({ auth: true, email : decoded.email });
+    } catch (err) {
+        res.send({ auth: false, message: 'Invalid token' });
+    }
+});
 //======= OTP Send ========
 userRouter.post('/sendOTP/:email', async (req, res) => {
     try {
         const email = req.params.email;
         const otp = generateOtp();
-        await sendOtp(email, otp); // Ensure sendOtp is awaited if it returns a promise
+        // Ensure sendOtp is awaited if it returns a promise
+        await sendOtp(email, otp);
         const newOtp = new Otp({ email, otp });
         await newOtp.save();
         res.send("Otp Sent Successfully...!");
+    } catch (err) {
+        res.json({ message: err });
+    }
+});
+// ======= Verify OTP =======
+userRouter.post('/verifyOTP/:email/:otp', async (req, res) => {
+    try {
+        const email = req.params.email;
+        const otp = req.params.otp;
+        const otpRecord = await Otp.findOne({ email, otp });
+
+        if (!otpRecord) {
+            return res.send("Invalid OTP");
+        }
+        // Optionally, you can delete the OTP record after verification
+        await Otp.deleteOne({ email, otp });
+
+        res.send("OTP Verified Successfully...!");
     } catch (err) {
         res.json({ message: err });
     }
@@ -25,23 +57,26 @@ userRouter.post('/registerUser', async (req, res) => {
         const data = req.body;
         const user = new User(data);
         await user.save();
-        res.json(user);
+        res.send("User Registered Successfully...!");
     } catch (err) {
-        res.json({ message: err });
+        res.send(err.message);
     }
 });
 
 module.exports = userRouter;
 
-// ======= Sample =======
+// ======= Login User =======
 userRouter.post('/loginUser', async (req, res) => {
     try {
-        const data = req.body;
-        const user = new User(data);
-        await user.save();
-        res.json(user);
+        const { email, password } = req.body;
+        const user = await User.findOne({ email, password });
+        
+        if (!user) {
+            return res.send("Invalid email or password");
+        }
+        res.send("Login successful...!");
     } catch (err) {
-        res.json({ message: err });
+        res.send(err.messag);
     }
 });
 
@@ -82,3 +117,20 @@ userRouter.post('/addToCart', async (req, res) => {
 //         }
 //     ],
 // }
+// // Generate JWT
+// userRouter.post('/generateToken', (req, res) => {
+//     const payload = { email: req.body.email ,password : req.body.password};
+//     const token = jwtSign(payload);
+//     res.send(token);
+// });
+
+// // Decode JWT
+// userRouter.post('/decodeToken', (req, res) => {
+//     const token = req.body.token;
+//     try {
+//         const decoded = jwtVerify(token);
+//         res.send(decoded);
+//     } catch (err) {
+//         res.send({ message: 'Invalid token' });
+//     }
+// });
