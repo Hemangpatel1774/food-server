@@ -70,8 +70,8 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     cart: {
-        type: [cartSchema],
-        default: [],
+        type: cartSchema,
+        default: {},
     },
     history: {
         type: [historySchema],
