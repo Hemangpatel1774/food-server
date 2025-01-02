@@ -12,6 +12,10 @@ const cartSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    rating:{
+        type: Number,
+        required: false,
+    },
     foodPrice: {
         type: Number,
         required: true
@@ -70,8 +74,8 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     cart: {
-        type: cartSchema,
-        default: {},
+        type: [cartSchema],
+        default: [],
     },
     history: {
         type: [historySchema],

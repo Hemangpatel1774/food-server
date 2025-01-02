@@ -86,7 +86,8 @@ userRouter.post('/loginUser', async (req, res) => {
 userRouter.post('/addToCart', async (req, res) => {
     try {
         const data = req.body;
-        const user = new User(data);
+        const user = new User.find({ email: data.email});
+        user.cart.push(data.cart);
         await user.save();
         res.json(user);
     } catch (err) {
