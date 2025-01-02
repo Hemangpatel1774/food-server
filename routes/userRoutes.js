@@ -27,7 +27,7 @@ userRouter.post('/sendOTP/:email', async (req, res) => {
         await sendOtp(email, otp);
         const newOtp = new Otp({ email, otp });
         await newOtp.save();
-        res.send("Otp Sent Successfully...!");
+        res.send({message:"ok"});
     } catch (err) {
         res.json({ message: err });
     }
@@ -45,7 +45,7 @@ userRouter.post('/verifyOTP/:email/:otp', async (req, res) => {
         // Optionally, you can delete the OTP record after verification
         await Otp.deleteOne({ email, otp });
 
-        res.send("OTP Verified Successfully...!");
+        res.send({message:"ok"});
     } catch (err) {
         res.json({ message: err });
     }
@@ -57,7 +57,8 @@ userRouter.post('/registerUser', async (req, res) => {
         const data = req.body;
         const user = new User(data);
         await user.save();
-        res.send("User Registered Successfully...!");
+        const userToken = jwtSign({ email : req.body.email, password : req.body.password });
+        res.send({message:"ok",userToken});
     } catch (err) {
         res.send(err.message);
     }
@@ -74,9 +75,10 @@ userRouter.post('/loginUser', async (req, res) => {
         if (!user) {
             return res.send("Invalid email or password");
         }
-        res.send("Login successful...!");
+        const userToken = jwtSign({ email, password });
+        res.send({message:"ok",userToken});
     } catch (err) {
-        res.send(err.messag);
+        res.send({message : err.message});
     }
 });
 
