@@ -10,8 +10,8 @@ userRouter.post('/sendOTP/:email', async (req, res) => {
     try {
         const email = req.params.email;
         const otp = generateOtp();
-        sendOtp(email, otp);
-        const newOtp = await Otp({email ,otp});
+        await sendOtp(email, otp); // Ensure sendOtp is awaited if it returns a promise
+        const newOtp = new Otp({ email, otp });
         await newOtp.save();
         res.send("Otp Sent Successfully...!");
     } catch (err) {
@@ -19,14 +19,13 @@ userRouter.post('/sendOTP/:email', async (req, res) => {
     }
 });
 
-
 // ======= Register User =======
 userRouter.post('/registerUser', async (req, res) => {
     try {
         const data = req.body;
-        const users = await User(data);
-        await users.save();
-        res.json(users);
+        const user = new User(data);
+        await user.save();
+        res.json(user);
     } catch (err) {
         res.json({ message: err });
     }
@@ -34,33 +33,29 @@ userRouter.post('/registerUser', async (req, res) => {
 
 module.exports = userRouter;
 
-
 // ======= Sample =======
-userRouter.post('/loginUser', async (req, res) => { 
+userRouter.post('/loginUser', async (req, res) => {
     try {
         const data = req.body;
-        const users = await User(data);
-        await users.save();
-        res.json(users);
-    } catch (err) {
-        res.json({ message: err });
-    }
-}
-);
-
-// ======= Sample =======
-userRouter.post('/addToCart', async (req, res) => {
-    try {
-        const data = req.body;
-        const users = await User(data);
-        await users.save();
-        res.json(users);
+        const user = new User(data);
+        await user.save();
+        res.json(user);
     } catch (err) {
         res.json({ message: err });
     }
 });
 
-
+// ======= Sample =======
+userRouter.post('/addToCart', async (req, res) => {
+    try {
+        const data = req.body;
+        const user = new User(data);
+        await user.save();
+        res.json(user);
+    } catch (err) {
+        res.json({ message: err });
+    }
+});
 
 
 
