@@ -5,7 +5,7 @@ const Otp = require('../Models/otpModel');
 const generateOtp = require('../funcs/generateOtp');
 const sendOtp = require('../funcs/sendOtp');
 const jwt = require('jsonwebtoken');
-const { jwtSign, jwtVerify } = require('../funcs/jwtFuncs');
+const { jwtSign, jwtVerify } = require('../funcs/jwtSign');
 
 
 // Authenticate JWT
@@ -73,7 +73,7 @@ userRouter.post('/loginUser', async (req, res) => {
         const user = await User.findOne({ email, password });
         
         if (!user) {
-            return res.send("Invalid email or password");
+            return res.send({message:"Invalid email or password"});
         }
         const userToken = jwtSign({ email, password });
         res.send({message:"ok",userToken});
