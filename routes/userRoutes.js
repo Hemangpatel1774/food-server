@@ -94,9 +94,12 @@ userRouter.post('/addToCart', async (req, res) => {
     try {
         const data = req.body.cartLst;
         const email = req.body.email;
+        console.log("eee",email);
+        
         let newCart = [];
         data.forEach((item) => {
             const cart = {
+                id: +item.id,
                 foodName: item.title,
                 rating: item.rating,
                 foodQuantity: +item.qty,
@@ -110,16 +113,39 @@ userRouter.post('/addToCart', async (req, res) => {
         if (!user) {
             return res.send({ message: "User not found" });
         }
-
         user.cart = newCart;
         await user.save();
         res.send({ message: "ok" });
 
     } catch (err) {
+        res.send({ message:"==>", err });
+    }
+});
+// ======= Get Cart =======
+userRouter.get('/getCart/:email', async (req, res) => {
+    try {
+        const email = req.params.email;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.send({ message: "User not found" });
+        }
+        result = []
+        user.cart.forEach((item) => {
+            const cart = {
+                id: +item.id,
+                title: item.foodName,
+                rating: item.rating,
+                qty: +item.foodQuantity,
+                price: +item.foodPrice,
+                img: item.foodImage
+            };
+            result = [...result, cart];
+        });
+        res.send({message:'ok' , cart:result });
+    } catch (err) {
         res.json({ message: err });
     }
 });
-
 
 
 
